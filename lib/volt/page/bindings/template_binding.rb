@@ -34,7 +34,7 @@ module Volt
     def update(path, section_or_arguments = nil, options = {})
       Computation.run_without_tracking do
         # Remove existing template and call _removed
-        controller_send(:"#{@action}_removed") if @action && @controller
+        controller_action(:"#{@action}_removed") if @action && @controller
         if @current_template
           @current_template.remove
           @current_template = nil
@@ -129,7 +129,7 @@ module Volt
         end
 
         # Trigger the action
-        controller_send(@action) if @action
+        controller_action(@action) if @action
 
         # Track the grouped controller
         @grouped_controller.set(@controller) if @grouped_controller
@@ -150,7 +150,7 @@ module Volt
           @controller.section = @current_template.dom_section
         end
 
-        controller_send(:"#{@action}_ready") if @action
+        controller_action(:"#{@action}_ready") if @action
       end
     end
 
@@ -158,7 +158,7 @@ module Volt
       @computation.stop
       @computation = nil
 
-      controller_send(:"before_#{@action}_remove") if @controller && @action
+      controller_action(:"before_#{@action}_remove") if @controller && @action
 
       clear_grouped_controller
 
@@ -171,7 +171,7 @@ module Volt
       super
 
       if @controller
-        controller_send(:"after_#{@action}_remove") if @action
+        controller_action(:"after_#{@action}_remove") if @action
 
         @controller = nil
       end
@@ -180,7 +180,7 @@ module Volt
     private
 
     # Sends the action to the controller if it exists
-    def controller_send(action_name)
+    def controller_action(action_name)
       if @controller.respond_to?(action_name)
         @controller.send(action_name)
       end
